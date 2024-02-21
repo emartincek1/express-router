@@ -68,6 +68,36 @@ describe("User Tests", () => {
     const users = await User.findAll();
     expect(response.body.length).toBe(users.length);
   });
+
+  test("post users returns errors array if feilds aren't provided", async () => {
+    const response = await request(app)
+      .post("/users")
+      .send({
+        user: { age: 10 },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
+
+  test("post users returns errors array if name is too short", async () => {
+    const response = await request(app)
+      .post("/users")
+      .send({
+        user: { naem: "fe", age: 10 },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
+
+  test("put users returns errors array if feilds aren't provided", async () => {
+    const response = await request(app)
+      .put("/users/1")
+      .send({
+        user: { age: 10 },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
 });
 
 describe("fruit Tests", () => {
@@ -134,5 +164,35 @@ describe("fruit Tests", () => {
     expect(response.body[4]).toEqual(undefined);
     const fruits = await Fruit.findAll();
     expect(response.body.length).toBe(fruits.length);
+  });
+
+  test("post fruits returns errors array if feilds aren't provided", async () => {
+    const response = await request(app)
+      .post("/fruits")
+      .send({
+        fruit: { name: "qweqwqw" },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
+
+  test("post fruits returns errors array if name is too short", async () => {
+    const response = await request(app)
+      .post("/fruits")
+      .send({
+        fruit: { name: "qwe", color: "red" },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
+  });
+
+  test("put fruits returns errors array if feilds aren't provided", async () => {
+    const response = await request(app)
+      .put("/fruits/1")
+      .send({
+        fruit: { name: "qweqwqwq" },
+      });
+    expect(response.body).toHaveProperty("error");
+    expect(Array.isArray(response.body.error)).toBe(true);
   });
 });

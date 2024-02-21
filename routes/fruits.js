@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const fruitRouter = Router();
 const { Fruit } = require("../models/index");
+const { check, validationResult } = require("express-validator");
 
 fruitRouter.get("/", async (req, res) => {
   const fruits = await Fruit.findAll();
@@ -13,21 +14,45 @@ fruitRouter.get("/:id", async (req, res) => {
   res.json(fruit);
 });
 
-fruitRouter.post("/", async (req, res) => {
-  const { fruit } = req.body;
-  await Fruit.create(fruit);
-  const fruits = await Fruit.findAll();
-  res.json(fruits);
-});
+fruitRouter.post(
+  "/",
+  [
+    check("fruit.color").not().isEmpty().trim(),
+    check("fruit.name").not().isEmpty().trim().isLength({ min: 5, max: 20 }),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json({ error: errors.array() });
+    } else {
+      const { fruit } = req.body;
+      await Fruit.create(fruit);
+      const fruits = await Fruit.findAll();
+      res.json(fruits);
+    }
+  }
+);
 
-fruitRouter.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { fruit } = req.body;
-  const oldFruit = await Fruit.findByPk(id);
-  await oldFruit.update(fruit);
-  const fruits = await Fruit.findAll();
-  res.json(fruits);
-});
+fruitRouter.put(
+  "/:id",
+  [
+    check("fruit.color").not().isEmpty().trim(),
+    check("fruit.name").not().isEmpty().trim().isLength({ min: 5, max: 20 }),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json({ error: errors.array() });
+    } else {
+      const { id } = req.params;
+      const { fruit } = req.body;
+      const oldFruit = await Fruit.findByPk(id);
+      await oldFruit.update(fruit);
+      const fruits = await Fruit.findAll();
+      res.json(fruits);
+    }
+  }
+);
 
 fruitRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
